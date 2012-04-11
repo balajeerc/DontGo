@@ -8,7 +8,7 @@ function GridThread()
 	  Variable: gridNodes
 	  Nodes that this thread connects
 	 */
-	this._gridNodes = [];
+	this._gridPieces = [];
 
 	/*
 	  Variable: owner
@@ -48,7 +48,7 @@ function GridThread()
 	
 }
 
-GridThread.prototype.init = function(settings,slate,node1,node2){
+GridThread.prototype.init = function(settings,slate,piece1,piece2,owner){
 	//Set the reference to settings
 	this._settings = settings;
 	
@@ -56,9 +56,14 @@ GridThread.prototype.init = function(settings,slate,node1,node2){
 	this._slate = slate;
 	
 	//Store the nodes
-	this.gridNodes.push(node1);
-	this.gridNodes.push(node2);	
+	this._gridPieces.push(piece1);
+	this._gridPieces.push(piece2);	
 	
+	piece1.addThread(this);
+	piece2.addThread(this);
+	
+	//Set the owner
+	this.owner = owner;
 		
 	//Create the KineticJS shape representing this thread
 	var thisObj = this;
@@ -67,27 +72,41 @@ GridThread.prototype.init = function(settings,slate,node1,node2){
 		    var context = this.getContext();
 		    thisObj.drawLine(context);
 		},
-		//stroke: this._settings.grid.gridLine.color,
-		//fill: this._settings.grid.gridLine.color,
 		strokeWidth: 1
     });
     
     var layer = this._slate.getDrawLayer();
     layer.add(this._shape);
+    
+    console.log("Registering color of thread as: "+this._settings.grid.gridThread["color"+(this.owner*0.5+1.5)]);
 }
 
 GridThread.prototype.drawLine = function(context)
 {
-	var node1 = this.gridNodes[0];
-	var node2 = this.gridNodes[1];
-	var color = this._settings.grid.gridLine["color"+(this.owner*0.5+1.5)];
+	var piece1 = this._gridPieces[0];
+	var piece2 = this._gridPieces[1];
+	var color = this._settings.grid.gridThread["color"+(this.owner*0.5+1.5)];
 
     context.beginPath();
-    context.moveTo(node1.position[0], node1.position[1]);
-    context.lineTo(node2.position[0], node2.position[1]);
+    context.moveTo(piece1.position[0], piece1.position[1]);
+    context.lineTo(piece2.position[0], piece2.position[1]);
     context.closePath();
     context.strokeStyle = color;
     context.stroke();
+}
+
+GridThread.prototype.remove = function()
+{
+	var drawLayer = this._slate.getDrawLayer();
+	drawLayer.remove(this._shape);
+}
+
+GridThread.prototype.getPiece = function(indx)
+{
+	if(indx!=0 && indx!=1)
+		throw("Invalid index specified for fetching node of grid thread");
+	
+	return this._gridPieces[indx];	
 }
 
 //expose module API

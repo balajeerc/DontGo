@@ -59,8 +59,7 @@ function GridNode()
    	  Variable: type
    	  Indicates the type of this class instance
    	 */
-   	this.type = "gridnode";
-	
+   	this.type = "gridnode";	
 };
 
 /*
@@ -90,8 +89,6 @@ GridNode.prototype.init = function(settings,slate){
                 strokeWidth: 0
    });
 
-	//
-	
 	//Add the circle to the draw layer of main slate
 	var drawLayer = slate.getDrawLayer();
 	if(drawLayer==null)
@@ -147,14 +144,6 @@ GridNode.prototype.onMouseOut = function(){
 	this._shape.fill = this._settings.grid.gridNode.color;
 	this._slate.refresh();	
 }
-
-/*
-  Method: draw
-  Draws the current grid node
-*/	
-GridNode.prototype.draw = function(){
-	this._shape.draw();
-}	
 
 //expose module API
 exports.instance = GridNode;

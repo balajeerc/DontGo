@@ -66,11 +66,11 @@ function Grid(){
    	this.type = "grid";
    	
    	/*
-   	  Variable: _threadCounter
+   	  Variable: _threadIdCounter
    	  Counter keeping track of threads 
    	  Used to generate unique ids for threads 
    	*/
-   	this._threadCounter = 0;
+   	this._threadIdCounter = 0;
 }
 
 /*
@@ -271,7 +271,7 @@ Grid.prototype.fitVerticesInGrid = function(vertexList,width,height){
 }
 
 /*
- Method: addGridThread
+ Method: addThread
  Adds a grid thread between two given nodes
  
  Parameters:
@@ -279,24 +279,39 @@ Grid.prototype.fitVerticesInGrid = function(vertexList,width,height){
   node2 - second node to connect thread between
   owner - player that this thread belongs to
 */	
-Grid.prototype.addGridThread = function(node1,node2,owner){
+Grid.prototype.addThread = function(node1,node2,owner){
 	//Run through the list of threads already in grid
 	//and ensure that there isnt another thread between
 	//the specified nodes belonging to the owner
-	
+	var newThread = new GridThread.instance();
+	newThread.init(this._settings,this._slate,node1,node2,owner);
+	newThread.id = this._threadIdCounter;
+	this._gridThreads.push(newThread);
+	this._threadIdCounter++;	
 }
 
 /*
- Method: removeGridThread
+ Method: removeThread
  Removes an existing grid thread between two given nodes
  
  Parameters:
-  node1 - first node that the thread connects
-  node2 - second node that the thread connects
-  owner - the player that this thread belongs to
+  thread - thread to be removed
 */	
-Grid.prototype.removeGridThread = function(node1,node2,owner){
-	
+Grid.prototype.removeThread = function(thread){
+	for(var i=0;i<this._gridThreads.length;i++)
+	{
+		var currThread = this._gridThreads[i];
+		if(currThread.id==thread.id)
+		{
+			//This is the thread we need to remove
+			var piece1 = currThread.getPiece(0);
+			var piece2 = currThread.getPiece(1);
+			piece1.removeThread(currThread);
+			piece2.removeThread(currThread);
+			currThread.remove();
+			this._gridThreads.splice(i,1);			
+		}
+	}
 }
 
 Grid.prototype.onMouseUp = function(){

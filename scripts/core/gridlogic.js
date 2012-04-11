@@ -30,7 +30,7 @@ function GridLogic(){
 	 	process
 	 */
 	this._mouseDown = false;
-	
+
 	/*
    	  Variable: type
    	  Indicates the type of this class instance
@@ -141,10 +141,21 @@ GridLogic.prototype.registerMouseUpOnGrid = function(){
 		{
 			//If we found a piece satisfying our above requirements,
 			// then draw a line between the active selected piece
-			//and the piece we just searched for.
-			console.log("Drawing line between piece with id "+this._activeSelection.id+
-						" piece with id " + reqPiece.id);
-
+			//and the piece we just searched for if there is no line
+			//between them already. If there is a line already, then we
+			//delete it
+			// console.log("Drawing line between piece with id "+this._activeSelection.id+
+						// " piece with id " + reqPiece.id);
+			var existingThread = reqPiece.findThreadToNode(this._activeSelection);
+			if(existingThread)
+			{
+				this._grid.removeThread(existingThread);
+			}
+			else
+			{
+				this._grid.addThread(reqPiece,this._activeSelection,this._activePlayer);
+			}
+			
 			//Clear active selection
 			this._activeSelection.select(false);
 			this._activeSelection = null;

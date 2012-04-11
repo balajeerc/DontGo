@@ -29,6 +29,12 @@ function GridPiece()
 	this._locatedNode = null;	
 	
 	/*
+   	  Variable: _threads
+   	  (private) Threads connecting this node to others
+   	 */
+   	this._threads = [];	
+
+	/*
 	  Variable: captured
 	  Indicates if this piece has been captured, 
 	  if so it is removed from grid
@@ -146,6 +152,7 @@ GridPiece.prototype.init = function(settings,slate){
    	// this._shape.on("mousemove", function(){currObj.onMouseMove();});
    	this._shape.on("mouseover", function(){currObj.onMouseOver();});
    	this._shape.on("mouseout", function(){currObj.onMouseOut();});
+   	this._shape.on("dblclick", function(){currObj.onDoubleClick();});
 }
 
 /*
@@ -221,6 +228,69 @@ GridPiece.prototype.moveTo = function(targetNode){
 }
 
 /*
+  Method: findThreadToNode
+  Finds a thread from the list of nodes this is connected to,
+  running towards the specified node
+  
+  Parameters:
+   node - node that we need to find a thread connected to
+*/		
+GridPiece.prototype.findThreadToNode = function(node){
+	
+	if(!this.owner == node.owner)
+	{
+		console.log("Piece not of same owner!");
+		return null;
+	}
+		
+	for(var i=0; i<this._threads.length; i++)
+	{
+		var currThread = this._threads[i];
+		if(currThread.getPiece(0).id==node.id ||
+			currThread.getPiece(1).id==node.id)
+			{
+				console.log("Returning thread!");
+				return this._threads[i];
+			}
+	}
+	
+	console.log("Couldn't find any thread to node!");
+	return null;
+}
+
+/*
+  Method: addThread
+  Adds a new thread to this piece's list of threads	
+	  
+  Parameters:
+   thread - thread to be added to this node
+*/		
+GridPiece.prototype.addThread = function(thread){
+	this._threads.push(thread);
+}
+
+/*
+  Method: removeThread
+  Removes a thread from this piece's list of threads	
+	  
+  Parameters:
+   thread - thread to be removed from this node
+*/		
+GridPiece.prototype.removeThread = function(thread){
+	for(var i=0; i<this._threads.length; i++)
+	{
+		var currThread = this._threads[i];
+		if(currThread.id == thread.id)
+		{
+			this._threads.splice(i,1);
+			return;
+		}		
+	}
+	
+	throw("Cannot find specified thread in this piece's thread list!");	
+}
+
+/*
   Method: onMouseDown
   Handler for the mouse down event
 */		
@@ -273,6 +343,15 @@ GridPiece.prototype.onMouseOut = function(){
 		return;
 	this._selectionShape.alpha = 0.0;
 	this._slate.refresh();
+}
+
+/*
+  Method: onDoubleClick
+  Handler for the double click event
+*/		
+GridPiece.prototype.onDoubleClick = function(){
+	// var gridLogic = this._grid.getGridLogic();
+	// gridLogic.registerMouseDoubleClickOnGridPiece(this);
 }
 
 //expose module API
