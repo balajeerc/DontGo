@@ -2,6 +2,7 @@ var GridNode = require('core/gridnode');
 var GridLine = require('core/gridline');
 var GridPiece = require('core/gridpiece');
 var GridLogic = require('core/gridlogic');
+var GridThread = require('core/gridthread');
 
 
 /*
@@ -33,6 +34,12 @@ function Grid(){
 	 grid pieces	
 	*/
 	this._gridThreads = [];
+
+	/*
+	 Variable: _backgroundShape
+	 (private) A shape that exists in the background only to detect input
+	*/
+	this._backgroundShape = null;
 	
 	/*
 	 Variable: _slate
@@ -57,7 +64,13 @@ function Grid(){
    	  Indicates the type of this class instance
    	 */
    	this.type = "grid";
-
+   	
+   	/*
+   	  Variable: _threadCounter
+   	  Counter keeping track of threads 
+   	  Used to generate unique ids for threads 
+   	*/
+   	this._threadCounter = 0;
 }
 
 /*
@@ -81,6 +94,18 @@ Grid.prototype.setupGrid = function(gridData){
 		
 	if(gridData==null)
 		throw("Invalid grid data specified to setup grid with!")		
+	
+	var stage = this._slate.getStage();
+	this._backgroundShape = new Kinetic.Rect({
+		x: 0,
+		y: 0,
+		width: stage.width,
+		height: stage.height,
+		alpha: 0.0
+    });
+	
+	var drawLayer = this._slate.getDrawLayer();
+	drawLayer.add(this._backgroundShape);
 	
 	//First we parse the vertex list
 	//For each vertex, we create a grid node
@@ -123,30 +148,62 @@ Grid.prototype.setupGrid = function(gridData){
 		this._gridNodes[i].init(this._settings,this._slate);
 	}
 	
+	var idGen = 1;
 	var pieces = gridData["start_pieces"];
 	var player1_pieces = pieces["player1"];
 	for(var i=0; i<player1_pieces.length; i++)
 	{
 		var newPiece = new GridPiece.instance();
 		newPiece.position = this._gridNodes[player1_pieces[i]].position;
-		newPiece.owner = 1;
+		newPiece.owner = -1;
+		newPiece.id = idGen*-1;
 		newPiece.init(this._settings,this._slate);
 		this._gridPieces.push(newPiece);
+		this._gridNodes[player1_pieces[i]].occupyingPiece = newPiece;
+		idGen++;
 	}
+	idGen = 1;
 	var player2_pieces = pieces["player2"];
 	for(var i=0; i<player2_pieces.length; i++)
 	{
 		var newPiece = new GridPiece.instance();
 		newPiece.position = this._gridNodes[player2_pieces[i]].position;
-		newPiece.owner = 2;
+		newPiece.owner = 1;
+		newPiece.id = idGen;
 		newPiece.init(this._settings,this._slate);
 		this._gridPieces.push(newPiece);
+		this._gridNodes[player2_pieces[i]].occupyingPiece = newPiece;
+		idGen++;
 	}
 	this._slate.refresh();
 	
 	//Initialise the grid logic
 	this._gridLogic = new GridLogic.instance();
-	this._gridLogic.init(this._settings,this._grid);
+	this._gridLogic.init(this._settings,this);
+	
+	var curr = this;
+	var drawLayer = this._slate.getDrawLayer();	
+	//drawLayer.on("mousedown", function(){curr.onMouseDown();});
+   	drawLayer.on("mouseup", function(){curr.onMouseUp();});
+   	//drawLayer.on("mousemove", function(){curr.onMouseMove();});
+   	//drawLayer.on("mouseover", function(){curr.onMouseOver();});
+   	//drawLayer.on("mouseout", function(){curr.onMouseOut();});
+}
+
+/*
+ Method: getGridLogic
+ Returns a reference to grid logic
+*/	
+Grid.prototype.getGridLogic = function(){
+	return this._gridLogic;
+}
+
+/*
+ Method: getGridPieces
+ Returns the list of pieces held by the grid
+*/	
+Grid.prototype.getGridPieces = function(){
+	return this._gridPieces;
 }
 	
 /*
@@ -211,6 +268,40 @@ Grid.prototype.fitVerticesInGrid = function(vertexList,width,height){
 		scaledVertexList.push([scaledx,scaledy]);
 	}	
 	return scaledVertexList;
+}
+
+/*
+ Method: addGridThread
+ Adds a grid thread between two given nodes
+ 
+ Parameters:
+  node1 - first node to connect thread between
+  node2 - second node to connect thread between
+  owner - player that this thread belongs to
+*/	
+Grid.prototype.addGridThread = function(node1,node2,owner){
+	//Run through the list of threads already in grid
+	//and ensure that there isnt another thread between
+	//the specified nodes belonging to the owner
+	
+}
+
+/*
+ Method: removeGridThread
+ Removes an existing grid thread between two given nodes
+ 
+ Parameters:
+  node1 - first node that the thread connects
+  node2 - second node that the thread connects
+  owner - the player that this thread belongs to
+*/	
+Grid.prototype.removeGridThread = function(node1,node2,owner){
+	
+}
+
+Grid.prototype.onMouseUp = function(){
+	console.log("Registering mouse up on layer!")
+	this._gridLogic.registerMouseUpOnGrid();
 }
 
 	

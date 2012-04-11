@@ -81,8 +81,8 @@ DrawSlate.prototype.init = function(app,width, height){
 	var waitInterval = 1000;
 	var thisSlate = this;
 	var dataLoop = setInterval(function(){
-		this._gridData = DRAWSLATE_GRID_DATA;
-		if(!this._gridData){
+		thisSlate._gridData = DRAWSLATE_GRID_DATA;
+		if(!thisSlate._gridData){
 			timeWaited += waitInterval;
 			//Timeout
 			if(timeWaited/1000 > 10.0){
@@ -93,9 +93,9 @@ DrawSlate.prototype.init = function(app,width, height){
 		}
 		else{
 			clearInterval(dataLoop);			
-		 	this._gameGrid = new Grid.instance();
- 			this._gameGrid.init(appSettings,thisSlate);
- 			this._gameGrid.setupGrid(this._gridData);
+		 	thisSlate._gameGrid = new Grid.instance();
+ 			thisSlate._gameGrid.init(appSettings,thisSlate);
+ 			thisSlate._gameGrid.setupGrid(thisSlate._gridData);
 		}
 	},waitInterval);
 }
@@ -159,6 +159,16 @@ DrawSlate.prototype.getStage = function(){
 */
 DrawSlate.prototype.getDrawLayer = function(){
 	return this._drawLayer;
+}
+
+/*
+  Method: getGrid
+  Returns reference to the game grid
+*/
+DrawSlate.prototype.getGrid = function(){
+	if(!this._gameGrid)
+		throw("Game grid not yet initialised!")
+	return this._gameGrid;
 }
 
 /*

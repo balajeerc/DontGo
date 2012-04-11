@@ -58,8 +58,6 @@ GridLine.prototype.init = function(settings,slate,node1,node2){
 		    context.strokeStyle = settings.grid.gridLine.color;
 		    context.stroke();
 		},
-		//stroke: this._settings.grid.gridLine.color,
-		//fill: this._settings.grid.gridLine.color,
 		strokeWidth: 1
     });
     

@@ -20,10 +20,22 @@ function GridNode()
 	this.adjacentNodes = [];
 	
 	/*
+	  Variable: occupyingPiece
+	  Grid piece currently occupying this node
+	*/
+	this.occupyingPiece = null;
+
+	/*
 	  Variable: _slate
 	  (private) Reference to the drawslate
 	 */
 	this._slate = null;
+
+	/*
+	  Variable: _grid
+	  (private) Reference to the game grid
+	 */
+	this._grid = null;
 	
 	/*
 	  Variable: _shape
@@ -38,10 +50,10 @@ function GridNode()
 	this._settings = null;
 	
 	/*
-	  Variable: _enforcer
+	  Variable: _gridLogic
 	  Reference to the game rule enforcer
 	 */
-	this.enforcer = null;
+	this._gridLogic = null;	
 	
    	/*
    	  Variable: type
@@ -61,6 +73,12 @@ GridNode.prototype.init = function(settings,slate){
 
 	//Cache the reference to the slate
 	this._slate = slate;
+	if(!this._slate)
+		throw("Cannot find slate to initialise grid node with!");
+	this._grid = slate.getGrid();
+	if(!this._grid)	
+		throw("Cannot find grid to initialise grid node with!");	
+	
 	// console.log("Drawing grid node at: "+this.position[0]+","+this.position[1]);
 	//Setup the kineticJS shape for this gridnode
 	this._shape = new Kinetic.Circle({
@@ -81,7 +99,7 @@ GridNode.prototype.init = function(settings,slate){
 	drawLayer.add(this._shape);
 	
 	var curr = this;	
-	// this._shape.on("mousedown", function(){curr.onMouseDown();});
+	this._shape.on("mousedown", function(){curr.onMouseDown();});
    	// this._shape.on("mouseup", function(){curr.onMouseUp();});
    	// this._shape.on("mousemove", function(){curr.onMouseMove();});
    	this._shape.on("mouseover", function(){curr.onMouseOver();});
@@ -93,6 +111,9 @@ GridNode.prototype.init = function(settings,slate){
   Handler for the mouse down event
 */		
 GridNode.prototype.onMouseDown = function(){
+	console.log("Mouse down on grid node!");
+	var gridLogic = this._grid.getGridLogic();
+	gridLogic.registerMouseDownOnGridNode(this);
 }
 
 /*

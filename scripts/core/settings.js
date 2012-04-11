@@ -26,6 +26,11 @@ function Settings()
 				color2: '#FF0000',
 				radius: 10.0,
 			},
+			gridThread:
+			{
+				color1: '#0033CC',
+				color2: '#FF0000',				
+			},
 		},
 	};
 }

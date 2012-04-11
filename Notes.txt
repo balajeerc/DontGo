@@ -13,12 +13,19 @@ TODO List:
 	v) Draw dark opaque circles with colours corresponding to each player's colour representing the player pieces. √
 
 2. Interacting with the pieces
-	i) During mouse over on a piece, darken the color slightly.
-	ii) During mouse click on a piece, draw another circle around indicating that it has been selected.
+	i) During mouse over on a piece, darken the color slightly.√
+	ii) During mouse click on a piece, draw another circle around indicating that it has been selected. √
 	iii) With a selected piece, if the player clicks another grid point
 		-If the grid point is blank
-			--If the move is legal, change the location of selected piece from previous to newly selected.
-	iv) On mouse drag, from a selected piece to another piece belonging to same player, draw a string connecting the two.	 		
+			--If the move is legal, change the location of selected piece from previous to newly selected. 
+	iv) On mouse drag, from a selected piece to another piece belonging to same player, draw a string connecting the two.
+		-Draw a line between pieces that moves with the connected pieces.
+		-Get entire layer to respond to mouse moves. √
+		-Get entire layer to respond to mouse ups. √
+		-Find a way to detect when a mouse drag happens. √
+		-When a mouse drag occurs, check if here is an active piece.
+			a) If there is an active piece, wait till the next mouse up. √
+			b) If the mouse over occurs on another piece of the same player, link the two pieces with a line. √		
 
 3. Thread sweeping
 	i) When a piece is moved, and it is connected to another thread, calculate the area this thread sweeps in the process
