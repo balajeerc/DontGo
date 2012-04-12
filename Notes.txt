@@ -19,17 +19,18 @@ TODO List:
 		-If the grid point is blank
 			--If the move is legal, change the location of selected piece from previous to newly selected. 
 	iv) On mouse drag, from a selected piece to another piece belonging to same player, draw a string connecting the two.
-		-Draw a line between pieces that moves with the connected pieces.
+		-Draw a line between pieces that moves with the connected pieces. √
 		-Get entire layer to respond to mouse moves. √
 		-Get entire layer to respond to mouse ups. √
 		-Find a way to detect when a mouse drag happens. √
 		-When a mouse drag occurs, check if here is an active piece.
 			a) If there is an active piece, wait till the next mouse up. √
-			b) If the mouse over occurs on another piece of the same player, link the two pieces with a line. √		
+			b) If the mouse over occurs on another piece of the same player, link the two pieces with a line. √	
+		-Remove thread by same action of dragging a line between the two pieces. √	
 
 3. Thread sweeping
 	i) When a piece is moved, and it is connected to another thread, calculate the area this thread sweeps in the process
-		-For first iteration, this can be done by finding the equation of the circle corresponding to this sweep
+		-For first iteration, this can be done by finding the equation of the circle corresponding to this sweep 
 	ii) Find all the vertices within the area of sweep
 		-Iterate over all the points occupied by the opponent in the grid and locate those falling within this circle (or on it)
 	iii) Eliminate all the pieces of opponent within this area of sweep

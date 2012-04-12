@@ -154,12 +154,11 @@ Grid.prototype.setupGrid = function(gridData){
 	for(var i=0; i<player1_pieces.length; i++)
 	{
 		var newPiece = new GridPiece.instance();
-		newPiece.position = this._gridNodes[player1_pieces[i]].position;
 		newPiece.owner = -1;
 		newPiece.id = idGen*-1;
 		newPiece.init(this._settings,this._slate);
 		this._gridPieces.push(newPiece);
-		this._gridNodes[player1_pieces[i]].occupyingPiece = newPiece;
+		newPiece.moveTo(this._gridNodes[player1_pieces[i]]);
 		idGen++;
 	}
 	idGen = 1;
@@ -167,12 +166,11 @@ Grid.prototype.setupGrid = function(gridData){
 	for(var i=0; i<player2_pieces.length; i++)
 	{
 		var newPiece = new GridPiece.instance();
-		newPiece.position = this._gridNodes[player2_pieces[i]].position;
 		newPiece.owner = 1;
 		newPiece.id = idGen;
 		newPiece.init(this._settings,this._slate);
 		this._gridPieces.push(newPiece);
-		this._gridNodes[player2_pieces[i]].occupyingPiece = newPiece;
+		newPiece.moveTo(this._gridNodes[player2_pieces[i]]);	
 		idGen++;
 	}
 	this._slate.refresh();

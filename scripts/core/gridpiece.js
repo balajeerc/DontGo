@@ -26,7 +26,7 @@ function GridPiece()
 	  Variable: _locatedNode
 	  (private) Grid node on which this piece is currently located
 	*/
-	this._locatedNode = null;	
+	this._occupiedNode = null;	
 	
 	/*
    	  Variable: _threads
@@ -197,6 +197,14 @@ GridPiece.prototype.select = function(mustSelect){
 }
 
 /*
+  Method: getOccupiedNode
+  Returns the node on which the piece is currently located
+*/
+GridPiece.prototype.getOccupiedNode = function(){
+	return this._occupiedNode;
+}
+
+/*
   Method: isSelected
   Returns a boolean indicating if this piece is selected
 */
@@ -224,7 +232,7 @@ GridPiece.prototype.moveTo = function(targetNode){
 	this._shape.x = this.position[0];
 	this._shape.y = this.position[1];
 	this._slate.refresh();
-	targetNode.occupiedPiece = this;
+	targetNode.occupyingPiece = this;
 }
 
 /*
@@ -288,6 +296,42 @@ GridPiece.prototype.removeThread = function(thread){
 	}
 	
 	throw("Cannot find specified thread in this piece's thread list!");	
+}
+
+/*
+  Method: getNumThreads
+  Returns the number of threads this piece holds
+*/		
+GridPiece.prototype.getNumThreads = function(){
+	return this._threads.length;
+}
+
+/*
+  Method: remove
+  Removes the piece from grid
+*/		
+GridPiece.prototype.remove = function(){
+	var drawLayer = this._slate.getDrawLayer();
+	drawLayer.remove(this._shape);
+	this.captured = true;
+	
+	//We also remove all the threads associated with this piece
+	for(var i=0;i<this._threads.length;i++)
+	{
+		this._grid.removeThread(this._threads[i]);
+	}
+}
+
+/*
+  Method: getThread
+  Returns a thread that this piece holds by index
+  
+  Parameters:
+   indx - index in thread array that must be returned
+   		  (must be within array bounds - use getNumThreads)  
+*/		
+GridPiece.prototype.getThread = function(indx){
+	return this._threads[indx];
 }
 
 /*

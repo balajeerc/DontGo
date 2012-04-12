@@ -98,14 +98,31 @@ GridLogic.prototype.registerMouseDownOnGridNode = function(node){
 	//Now that we have established that the current node is blank
 	//and that there is a valid actively selected piece, we simply
 	//need to:
-	// i) move this piece onto the specified point on the grid	
+	//i) Make note of the current location of actively selected piece
+	var currLocation = this._activeSelection.getOccupiedNode();
+	if(!currLocation)
+		throw("Cannot find current location of piece!");
+	//ii) Move this piece onto the specified point on the grid	
 	this._activeSelection.moveTo(node);
-	//ii) Deselect the currently selected grid piece
+	//iii) Deselect the currently selected grid piece
 	console.log("Deselecting currently selected piece!");
 	this._activeSelection.select(false);
-	//iii) Clear the active selection
+	//iv) Test for piece removal on thread sweeping	
+	//If the activeSelection that was just moved, has a thread attached
+	//to it, we need to check if the movement of the piece just made, sweeps
+	//over any of the opponent's pieces. If so, the opponent's pieces are to
+	//to be removed from the board
+	var sweptPieces = this.getSweptPieces(this._activeSelection,currLocation,node);
+	if(sweptPieces)
+	{
+		for(var i=0; i<sweptPieces.length; i++)
+		{
+			sweptPieces[i].remove();
+		}	
+	}
+	//v) Clear the active selection
 	this._activeSelection = null;
-	//iv) Change the active player (effect a change of turn)
+	//vi) Change the active player (effect a change of turn)
 	this._activePlayer = this._activePlayer*-1;
 	
 	console.log("Moving piece of "+this._activePlayer+" to grid node!");
@@ -168,5 +185,99 @@ GridLogic.prototype.registerMouseUpOnGrid = function(){
 	 
 	this._mouseDown = false;
 }
+
+/*
+  Method: getSweptPieces
+  Tests if moving a piece, with one or more threads attached to
+  it causes these threads to sweep over any of the opponent's pieces.
+  If there are such pieces that are removed, this function returns
+  an array of the removed pieces
+  
+  Parameters:
+   piece - piece that is being moved
+   currentNode - node on which the piece is currently located
+   targetNode - node to which the piece will be moved   
+*/		
+GridLogic.prototype.getSweptPieces = function(piece,currentNode,targetNode){
+	
+	var sweptPieces = [];
+	
+	if(!targetNode || !currentNode)
+		throw("Invalid nodes specified for processing sweeping with!");
+	
+	function SameSide(p1,p2,a,b)
+	{
+		var ba = [0.0,0.0];
+		ba[0] = b[0] - a[0];
+		ba[1] = b[1] - a[1];
+		
+		var p1a = [0.0,0.0];
+		p1a[0] = p1[0] - a[0];
+		p1a[1] = p1[1] - a[1];
+		
+		var p2a = [0.0,0.0];
+		p2a[0] = p2[0] - a[0];
+		p2a[1] = p2[1] - a[1];
+
+		var cp1 = ba[0]*p1a[1] - ba[1]*p1a[0];
+		var cp2 = ba[0]*p2a[1] - ba[1]*p2a[0];
+
+    	if(cp1*cp2 >= 0)
+    		return true
+    	return false
+	}
+	
+	function PointInTriangle(p,a,b,c)
+	{
+    	if( SameSide(p,a,b,c) && SameSide(p,b,a,c) && SameSide(p,c,a,b) )
+    		return true;    		
+    	return false;
+	}
+	
+	var numThreads = piece.getNumThreads();
+	if(numThreads<=0)
+		return null;
+		
+	for(var i=0; i<numThreads; ++i)
+	{
+		var currThread = piece.getThread(i);
+		if(!currThread)
+			throw("Cannot find thread for piece as expected!");
+		
+		//We need the location of the other node connected to
+		//this one via this thread
+		var otherPiece = currThread.getPiece(0).id==piece.id?
+							currThread.getPiece(1):
+								currThread.getPiece(0);	
+		if(!otherPiece)
+			throw("Cannot find other piece if grid thread being swept!");
+		
+		var currLoc = currentNode.position;
+		var targLoc = targetNode.position;
+		var otherLoc = otherPiece.position;
+		
+		var pieceList = this._grid.getGridPieces();
+		for(var j=0;j<pieceList.length;j++)
+		{
+			var checkedPiece = pieceList[j];
+						
+			//Check if this piece is the other player's
+			if(checkedPiece.owner==piece.owner*-1)
+			{
+				var swept = PointInTriangle(checkedPiece.position,
+											currLoc,
+											targLoc,
+											otherLoc);
+				if(swept)
+				{
+					sweptPieces.push(checkedPiece);
+				}					
+			}			
+		}	
+	}
+	
+	return sweptPieces;	
+}
+
 //expose module API
 exports.instance = GridLogic;
